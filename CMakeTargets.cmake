@@ -1,0 +1,1 @@
+set(CMAKE_EXPORT_TARGETS dxil2spirv)

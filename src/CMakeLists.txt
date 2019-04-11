@@ -39,11 +39,17 @@ add_compile_options(
 	
 add_definitions(-D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -D_SCL_SECURE_NO_WARNINGS)
 
-add_library(dxil2spirv STATIC
-  dxil2spirv.cpp 
-  dxil2spirv_optimize.cpp
-  dxil2spirv_options.c
-)
+file(GLOB_RECURSE SPIRV_BUILDER_SOURCES CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/SPIRV-Builder/*)
+
+set(dxil2spirv_src
+  ${SPIRV_BUILDER_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/dxil2spirv.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dxil2spirv_optimize.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/dxil2spirv_options.c)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${dxil2spirv_src})
+
+add_library(dxil2spirv STATIC ${dxil2spirv_src})
 
 add_executable(dxil-cross main.cpp)
 target_link_libraries(dxil2spirv SPIRV-Tools-opt)
@@ -55,6 +61,7 @@ if (SKULD)
   strip_symbol(dxil-cross)
 else()
   target_include_directories(dxil-cross PRIVATE ${DXC_INCLUDE_DIR})
-  target_link_libraries(dxil2spirv LLVMHLSL)
+  target_link_libraries(dxil2spirv LLVMDXIL LLVMDxilContainer)
+  target_link_libraries(dxil-cross LLVMMSSupport)
   target_include_directories(dxil2spirv PRIVATE ${SPIRV_HEADER_INCLUDE_DIR} ${SPIRV_TOOLS_INCLUDE_DIR} ${DXC_INCLUDE_DIR})
 endif()

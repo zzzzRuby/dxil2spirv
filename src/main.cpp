@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 
-	dxil2spirv_options options;
+	dxil2spirv::options options;
 	options.enableOptimizer = !Od;
 	options.stripName = StripDebug;
 	options.enableWrapperFunction = !DisableWrapperFunc;
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
 		std::istreambuf_iterator<char>());
 	std::vector<uint32_t> spirv;
 
-	dxil2spirv(spirv, dxil.data(), dxil.size(), &options);
+	dxil2spirv::convert(spirv, dxil.data(), dxil.size(), &options);
 
 	std::ofstream(OutputFilename, std::ios::binary)
 		.write((char *)spirv.data(),

@@ -12,7 +12,6 @@ extern "C" {
 typedef struct dxil2spirv_options {
 	bool stripName;
 	bool enableOptimizer;
-	bool enableWrapperFunction;
 } dxil2spirv_options;
 
 typedef struct dxil2spirv_result dxil2spirv_result;

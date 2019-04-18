@@ -27,8 +27,6 @@ int main(int argc, char** argv) {
 	cl::opt<bool>
 		Od("Od", cl::desc("Disable spirv-opt"), cl::init(false));
 	cl::opt<bool>
-		DisableWrapperFunc("no-wrapper", cl::desc("Disable wrapper function"), cl::init(false));
-	cl::opt<bool>
 		StripDebug("strip-debug", cl::desc("Strip debug info"), cl::init(false));
 	cl::ParseCommandLineOptions(argc, argv, "dxil to spirv\n");
 	if (ShowHelp) {
@@ -43,7 +41,6 @@ int main(int argc, char** argv) {
 	dxil2spirv::options options;
 	options.enableOptimizer = !Od;
 	options.stripName = StripDebug;
-	options.enableWrapperFunction = !DisableWrapperFunc;
 
 	std::ifstream fin(InputFilename, std::ios::binary);
 	std::vector<uint8_t> dxil((std::istreambuf_iterator<char>(fin)),

@@ -12,6 +12,8 @@ extern "C" {
 typedef struct dxil2spirv_options {
 	bool stripName;
 	bool enableOptimizer;
+	bool runValidator;
+	bool enable16bitsType;
 } dxil2spirv_options;
 
 typedef struct dxil2spirv_result dxil2spirv_result;

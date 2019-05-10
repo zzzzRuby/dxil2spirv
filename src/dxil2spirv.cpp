@@ -1,20 +1,10 @@
-#define _HAS_AUTO_PTR_ETC 1
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-
-#include <dxil2spirv.h>
 #include <iostream>
+#include <sstream>
 #include "DXIL-Translator/Translator.h"
-#include <dxc/DXIL/DXIL.h>
 #include <dxc/DxilContainer/DxilContainer.h>
-#include <llvm/IR/BasicBlock.h>
-#include <llvm/ADT/APFloat.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/IR/LLVMContext.h>
-
-namespace dxil2spirv
-{
-	void optimize(const options* options, std::vector<uint32_t>& spirv);
-}
+#include <spirv-tools/libspirv.hpp>
 
 extern "C"
 {
@@ -48,6 +38,8 @@ extern "C"
 
 namespace dxil2spirv
 {
+	void optimize(const options* _option, std::vector<uint32_t>& spirv, spv_target_env spvEnv);
+
 	static bool DxilFindModule(const uint8_t* dxil, size_t dxilSize, std::vector<uint8_t>& pTarget) {
 
 		const hlsl::DxilContainerHeader* pContainer = hlsl::IsDxilContainerLike(dxil, dxilSize);
@@ -72,14 +64,11 @@ namespace dxil2spirv
 		return true;
 	}
 
-	static void convert(const options * options,
-		const hlsl::DxilModule & dxilModule, std::vector<uint32_t> & spirv)
-	{
-
-	}
-
 	void convert(std::vector<uint32_t> & spirv, const uint8_t * dxil,
-		size_t dxilSize, const options * option) {
+		size_t dxilSize, const options * option)
+	{
+		constexpr spv_target_env spvEnv = spv_target_env::SPV_ENV_VULKAN_1_1;
+
 		std::vector<uint8_t> mDXIL;
 		DxilFindModule(dxil, dxilSize, mDXIL);
 
@@ -90,15 +79,54 @@ namespace dxil2spirv
 			llvm::getGlobalContext());
 
 		auto err = MorE.getError();
-		if (MorE) {
+		if (MorE)
+		{
 			std::unique_ptr<llvm::Module> M = std::move(MorE.get());
 			hlsl::DxilModule& dxilM = M->GetOrCreateDxilModule();
 
 			const options* _option =
 				option == nullptr ? dxil2spirv_get_default_options() : option;
 
-			convert(_option, dxilM, spirv);
-			optimize(_option, spirv);
+			dxil::convert(_option, dxilM, spirv);
+
+			if (_option->runValidator)
+			{
+				spvtools::SpirvTools tools(spvEnv);
+				std::stringstream messageConsumer;
+				tools.SetMessageConsumer([&messageConsumer](spv_message_level_t level, const char*, const spv_position_t & position, const char* message)
+				{
+					switch (level)
+					{
+					case SPV_MSG_FATAL:
+					case SPV_MSG_INTERNAL_ERROR:
+					case SPV_MSG_ERROR:
+						messageConsumer << "error: line " << position.index << ": " << message
+							<< std::endl;
+						break;
+					case SPV_MSG_WARNING:
+						messageConsumer << "warning: line " << position.index << ": " << message
+							<< std::endl;
+						break;
+					case SPV_MSG_INFO:
+						messageConsumer << "info: line " << position.index << ": " << message
+							<< std::endl;
+						break;
+					default:
+						break;
+					}
+				});
+
+				bool succeed = tools.Validate(spirv.data(), spirv.size());
+
+				if (std::string str = messageConsumer.str(); str != "")
+				{
+					//TODO: output str
+				}
+
+				if (!succeed) return;
+			}
+
+			optimize(_option, spirv, spvEnv);
 		}
 	}
 }

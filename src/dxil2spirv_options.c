@@ -2,7 +2,9 @@
 
 static dxil2spirv_options dxil2spirv_default_options = {
     .enableOptimizer = true, 
-	.stripName = false
+	.stripName = false,
+	.runValidator = false,
+	.enable16bitsType = true
 };
 
 const dxil2spirv_options *dxil2spirv_get_default_options() {

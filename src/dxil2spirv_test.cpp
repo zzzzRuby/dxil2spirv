@@ -20,7 +20,7 @@ int main()
 	CComPtr<IDxcLibrary> pLibrary;
 	hr = DxcCreateInstance(CLSID_DxcLibrary, IID_PPV_ARGS(&pLibrary));
 
-	for each (const dxil2spirv_test & test in dxil2spirv_test_instances)
+	for (const dxil2spirv_test & test : dxil2spirv_test_instances)
 	{
 		CComPtr<IDxcBlobEncoding> pSource;
 		pLibrary->CreateBlobWithEncodingFromPinned(test.hlsl.data(),

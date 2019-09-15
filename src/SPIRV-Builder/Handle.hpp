@@ -14,23 +14,17 @@ namespace dxil2spirv
 			Handle& operator++() { _++; return *this; }
 			operator bool() const { return _; }
 			operator uint32_t() const { return _; }
-			friend bool operator<(Handle a, Handle b);
-			friend bool operator>(Handle a, Handle b);
-			friend bool operator<=(Handle a, Handle b);
-			friend bool operator>=(Handle a, Handle b);
-			friend bool operator==(Handle a, Handle b);
-			friend bool operator!=(Handle a, Handle b);
 		private:
 			uint32_t _;
 		public:
 			static const Handle Null;
 		};
 
-		static inline bool operator<(Handle a, Handle b) { return a._ < b._; }
-		static inline bool operator>(Handle a, Handle b) { return a._ > b._; }
-		static inline bool operator<=(Handle a, Handle b) { return a._ <= b._; }
-		static inline bool operator>=(Handle a, Handle b) { return a._ >= b._; }
-		static inline bool operator==(Handle a, Handle b) { return a._ == b._; }
-		static inline bool operator!=(Handle a, Handle b) { return a._ != b._; }
+		static inline bool operator<(Handle a, Handle b) { return (uint32_t)a < (uint32_t)b; }
+		static inline bool operator>(Handle a, Handle b) { return (uint32_t)a > (uint32_t)b; }
+		static inline bool operator<=(Handle a, Handle b) { return (uint32_t)a <= (uint32_t)b; }
+		static inline bool operator>=(Handle a, Handle b) { return (uint32_t)a >= (uint32_t)b; }
+		static inline bool operator==(Handle a, Handle b) { return (uint32_t)a == (uint32_t)b; }
+		static inline bool operator!=(Handle a, Handle b) { return (uint32_t)a != (uint32_t)b; }
 	}
 }

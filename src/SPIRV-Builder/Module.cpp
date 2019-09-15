@@ -18,7 +18,7 @@ namespace dxil2spirv
 			bytecode.push_back(++idBound);
 			bytecode.push_back(0u);
 
-			for each (spv::Capability c in capability)
+			for (spv::Capability c : capability)
 			{
 				Inst(spv::Op::OpCapability)
 					.addOperand(c)
@@ -37,7 +37,7 @@ namespace dxil2spirv
 
 			if (!hasEntry) throw std::bad_exception();
 
-			for each (std::shared_ptr<Function> func in funcs)
+			for (std::shared_ptr<Function> func : funcs)
 				func->dump(bytecode);
 		}
 
@@ -213,7 +213,7 @@ namespace dxil2spirv
 			std::string_view entryName,
 			const std::vector<Handle>& interfaces)
 		{
-			for each (std::shared_ptr<Function> f in funcs)
+			for (std::shared_ptr<Function> f : funcs)
 			{
 				if (entry == f)
 				{

@@ -54,7 +54,7 @@ namespace dxil2spirv
 
 		Inst& Inst::addOperand(const std::vector<Handle>& t)
 		{
-			for each (Handle v in t)
+			for (Handle v : t)
 				addOperand(v);
 			return *this;
 		}

@@ -39,7 +39,7 @@ namespace dxil2spirv
 		{
 			output.insert(output.end(), bytecode.begin(), bytecode.end());
 			entryBlock->dump(output);
-			for each (std::shared_ptr<Block> block in blocks)
+			for(std::shared_ptr<Block> block : blocks)
 				if (block != entryBlock)
 					block->dump(output);
 

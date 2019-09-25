@@ -60,6 +60,10 @@ add_executable(dxil-cross main.cpp)
 target_link_libraries(dxil2spirv SPIRV-Tools-opt)
 target_link_libraries(dxil-cross dxil2spirv)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+	add_compile_options(-fms-extensions -Wno-language-extension-token)
+endif()
+
 if (SKULD)
   target_link_libraries(dxil2spirv DirectXShaderCompiler)
   skuld_mark_as_tool(dxil-cross)

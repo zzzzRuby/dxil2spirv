@@ -26,11 +26,12 @@ if __name__ == "__main__":
         "#include <array>",
         "#include <string_view>",
         "typedef struct dxil2spirv_test {",
-        "\tstd::string_view name;",
-        "\tstd::string_view hlsl;",
-        "\tstd::wstring_view entry;",
-        "\tstd::wstring_view profile;",
-        "} dxil2spirv_test;"
+        "\tstd::string name;",
+        "\tstd::string hlsl;",
+        "\tstd::wstring entry;",
+        "\tstd::wstring profile;",
+        "} dxil2spirv_test;",
+        "using namespace std::string_literals;"
     ]
     shadernames = []
     def dxcompile(name, profile, entry):
@@ -75,9 +76,9 @@ if __name__ == "__main__":
                 hlsl = f.read()
 
                 with open(os.path.join(options.output, f"{name}.hlsl.h"), "w") as f2:
-                    f2.write(f'static constexpr std::string_view {name}_hlsl = u8R"({hlsl})";\n')
-                    f2.write(f'static constexpr std::wstring_view {name}_hlsl_entry = LR"({entry})";\n')
-                    f2.write(f'static constexpr std::wstring_view {name}_hlsl_profile = LR"({profile}_{profile_version})";')
+                    f2.write(f'static const std::string {name}_hlsl = u8R"({hlsl})";\n')
+                    f2.write(f'static const std::wstring {name}_hlsl_entry = LR"({entry})";\n')
+                    f2.write(f'static const std::wstring {name}_hlsl_profile = LR"({profile}_{profile_version})";')
             shaderlist.append(f'#include "{name}.hlsl.h"')
             shadernames.append(name)
 
@@ -85,7 +86,7 @@ if __name__ == "__main__":
 
     if options.generate_header:
         with open(os.path.join(options.output, "dxil2spirv_test.h"), "w") as f2:
-            shaderlist.append(f'static constexpr std::array<dxil2spirv_test, {len(shadernames)}> dxil2spirv_test_instances = {{')
+            shaderlist.append(f'static const std::array<dxil2spirv_test, {len(shadernames)}> dxil2spirv_test_instances = {{')
             for name in shadernames:
                 shaderlist.append(f'\t{{ u8R"({name})", {name}_hlsl, {name}_hlsl_entry, {name}_hlsl_profile }},')
             shaderlist.append('};')
